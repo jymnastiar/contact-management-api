@@ -4,10 +4,47 @@ Backend API for managing users, contacts, and addresses built with Bun, Express,
 
 ## Prerequisites
 
-- [Bun](https://bun.sh/) (v1.1 or later)
-- PostgreSQL
+- [Docker](https://www.docker.com/) & Docker Compose (Recommended)
+- *Or* [Bun](https://bun.sh/) (v1.1 or later) & PostgreSQL for local setup without Docker.
 
-## Getting Started
+---
+
+## Option 1: Running with Docker (Recommended)
+
+Running with Docker does not require installing Bun or `node_modules` on your host machine.
+
+### 1. Configure environment variables
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+### 2. Start all containers
+
+Start the backend API, PostgreSQL database, and pgAdmin panel:
+
+```bash
+docker compose up -d --build
+```
+
+### 3. Run database migrations inside container
+
+Execute Prisma migration deploy directly inside the `backend-contact-management` container (no local `node_modules` required):
+
+```bash
+docker container exec -it backend-contact-management bunx prisma migrate deploy
+```
+
+The services will be available at:
+- **API**: `http://localhost:3000`
+- **PostgreSQL**: `localhost:5433`
+- **pgAdmin 4**: `http://localhost:8080` (Email: `admin@admin.com`, Password: `admin`)
+
+---
+
+## Option 2: Local Development Setup (Without Docker)
 
 ### 1. Install dependencies
 
@@ -17,7 +54,7 @@ bun install
 
 ### 2. Configure environment variables
 
-Copy the example environment file:
+Copy and adjust `.env`:
 
 ```bash
 cp .env.example .env
@@ -37,18 +74,16 @@ REFRESH_EXPIRES_IN="1d"
 
 ### 3. Run database migrations
 
-Apply Prisma migrations and generate the client:
+Apply Prisma migrations and generate the client locally:
 
 ```bash
 bunx prisma migrate dev
 bunx prisma generate
 ```
 
-## Running the Application
+### 4. Running the Application
 
-### Development mode
-
-Starts the server with hot-reloading:
+#### Development mode (with hot-reloading):
 
 ```bash
 bun dev
@@ -56,14 +91,14 @@ bun dev
 
 The server runs on `http://localhost:3000`.
 
-### Production mode
-
-Build and start the production bundle:
+#### Production mode:
 
 ```bash
 bun run build
 bun start
 ```
+
+---
 
 ## Running Tests
 
@@ -89,3 +124,4 @@ Endpoint specifications and request/response contracts are documented in the `do
 - [User & Auth API](docs/user.md)
 - [Contact API](docs/contact.md)
 - [Address API](docs/address.md)
+
