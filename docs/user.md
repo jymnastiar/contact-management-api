@@ -1,82 +1,116 @@
-# User API Spec
+# 👤 User API Specification
 
-## Register User
+Dokumentasi ini menjelaskan spesifikasi lengkap endpoint manajemen user dan sistem autentikasi berbasis **Hybrid JWT (Access Token) & HttpOnly Cookie (Refresh Token)**.
 
-Endpoint : `POST /api/users`
+---
 
-Request Headers :
-- `Content-Type: application/json`
+## 🔐 Mekanisme Autentikasi
 
-Request Body :
+1. **Access Token (Short-lived)**:
+   * Dikembalikan di Response Body JSON (`access_token`).
+   * Digunakan untuk mengakses endpoint yang diproteksi melalui header:
+     `Authorization: Bearer <access_token>`
+2. **Refresh Token (Long-lived & Secure)**:
+   * Disimpan di dalam **HttpOnly Cookie** bernama `refresh_token` (`SameSite=Lax`, `Path=/`).
+   * Token disimpan dalam bentuk hash (Bcrypt) di database.
+   * Dikirim otomatis oleh browser/klien via cookie untuk memperbarui access token (`GET /api/users/current/token`) dan logout (`DELETE /api/users/current`).
 
+---
+
+## 1. Register User
+
+Mendaftarkan akun user baru ke dalam sistem.
+
+* **Endpoint** : `POST /api/users`
+* **Request Headers** :
+  * `Content-Type: application/json`
+  * `Accept: application/json`
+
+* **Request Body** :
 ```json
 {
-  "username": "khannedy",
+  "username": "eko_khannedy",
   "password": "secretpassword",
   "name": "Eko Khannedy"
 }
 ```
 
-Response Headers :
-- `Set-Cookie: refresh_token=<jwt_refresh_token>; HttpOnly; SameSite=Lax; Path=/; Max-Age=86400`
+> **Aturan Validasi (Zod):**
+> * `username`: String, min 4, max 100 karakter, hanya boleh huruf kecil, angka, dan underscore (`/^[a-z0-9_]+$/`).
+> * `password`: String, min 6, max 100 karakter.
+> * `name`: String, min 4, max 100 karakter.
 
-Response Body (201 Created) :
+* **Response Headers** :
+  * `Set-Cookie: refresh_token=<jwt_refresh_token>; Max-Age=86400; Path=/; HttpOnly; SameSite=Lax`
 
+* **Response Body (201 Created)** :
 ```json
 {
   "message": " register new account",
   "data": {
-    "username": "khannedy",
+    "username": "eko_khannedy",
     "name": "Eko Khannedy"
   },
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
-Response Body (400 Bad Request) :
-
+* **Response Body (400 Bad Request - Username Duplikat)** :
 ```json
 {
   "errors": "Username already exists"
 }
 ```
 
----
-
-## Login User
-
-Endpoint : `POST /api/users/login`
-
-Request Headers :
-- `Content-Type: application/json`
-
-Request Body :
-
+* **Response Body (400 Bad Request - Validasi Gagal)** :
 ```json
 {
-  "username": "khannedy",
+  "errors": "Validation error: [ ... ]"
+}
+```
+
+---
+
+## 2. Login User
+
+Masuk ke akun yang sudah terdaftar untuk mendapatkan token akses dan cookie refresh token.
+
+* **Endpoint** : `POST /api/users/login`
+* **Request Headers** :
+  * `Content-Type: application/json`
+  * `Accept: application/json`
+
+* **Request Body** :
+```json
+{
+  "username": "eko_khannedy",
   "password": "secretpassword"
 }
 ```
 
-Response Headers :
-- `Set-Cookie: refresh_token=<jwt_refresh_token>; HttpOnly; SameSite=Lax; Path=/; Max-Age=3600`
+* **Response Headers** :
+  * `Set-Cookie: refresh_token=<jwt_refresh_token>; Max-Age=3600; Path=/; HttpOnly; SameSite=Lax`
 
-Response Body (200 OK) :
-
+* **Response Body (200 OK)** :
 ```json
 {
   "message": "Success login to account",
   "data": {
-    "username": "khannedy",
+    "username": "eko_khannedy",
     "name": "Eko Khannedy"
   },
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
-Response Body (400 Bad Request) :
+* **Response Body (400 Bad Request - Akun Tidak Ditemukan)** :
+```json
+{
+  "errors": "Username not register yet"
+}
+```
 
+* **Response Body (400 Bad Request - Password Salah)** :
 ```json
 {
   "errors": "Username and password not match"
@@ -85,41 +119,41 @@ Response Body (400 Bad Request) :
 
 ---
 
-## Get Current User
+## 3. Get Current User Profile
 
-Endpoint : `GET /api/users/current`
+Mengambil informasi profil user yang sedang login saat ini.
 
-Request Headers :
-- `Authorization: Bearer <access_token>`
+* **Endpoint** : `GET /api/users/current`
+* **Request Headers** :
+  * `Authorization: Bearer <access_token>`
+  * `Accept: application/json`
 
-Response Body (200 OK) :
-
+* **Response Body (200 OK)** :
 ```json
 {
   "message": "Success get current user profile",
   "data": {
-    "username": "khannedy",
+    "username": "eko_khannedy",
     "name": "Eko Khannedy"
   }
 }
 ```
 
-Response Body (401 Unauthorized) :
-
+* **Response Body (401 Unauthorized - Token Tidak Ada)** :
 ```json
 {
   "errors": "Access token needed"
 }
 ```
-*atau:*
+
+* **Response Body (401 Unauthorized - Token Expired / Invalid)** :
 ```json
 {
-  "errors": "Invalid or expired token"
+  "errors": "jwt expired"
 }
 ```
 
-Response Body (404 Not Found) :
-
+* **Response Body (404 Not Found)** :
 ```json
 {
   "errors": "User not found"
@@ -128,16 +162,17 @@ Response Body (404 Not Found) :
 
 ---
 
-## Update Current User
+## 4. Update Current User Profile
 
-Endpoint : `PATCH /api/users/current`
+Memperbarui data nama atau password user yang sedang login.
 
-Request Headers :
-- `Authorization: Bearer <access_token>`
-- `Content-Type: application/json`
+* **Endpoint** : `PATCH /api/users/current`
+* **Request Headers** :
+  * `Authorization: Bearer <access_token>`
+  * `Content-Type: application/json`
+  * `Accept: application/json`
 
-Request Body :
-
+* **Request Body** :
 ```json
 {
   "name": "Eko Kurniawan Khannedy",
@@ -146,37 +181,43 @@ Request Body :
 ```
 *(Catatan: Semua field bersifat opsional)*
 
-Response Body (200 OK) :
-
+* **Response Body (200 OK)** :
 ```json
 {
   "message": "Successfully update user data",
   "data": {
-    "username": "khannedy",
+    "username": "eko_khannedy",
     "name": "Eko Kurniawan Khannedy"
   }
 }
 ```
 
-Response Body (400 / 401 / 404) :
-
+* **Response Body (400 Bad Request - Validasi Gagal)** :
 ```json
 {
-  "errors": "Validation error: ..."
+  "errors": "Validation error: [ ... ]"
+}
+```
+
+* **Response Body (401 Unauthorized)** :
+```json
+{
+  "errors": "Access token needed"
 }
 ```
 
 ---
 
-## Refresh Access Token
+## 5. Refresh Access Token
 
-Endpoint : `GET /api/users/current/token`
+Membuat `access_token` baru ketika token lama sudah kedaluwarsa, menggunakan `refresh_token` yang tersimpan di HttpOnly Cookie.
 
-Request Cookies :
-- `Cookie: refresh_token=<jwt_refresh_token>`
+* **Endpoint** : `GET /api/users/current/token`
+* **Request Headers / Cookies** :
+  * `Cookie: refresh_token=<jwt_refresh_token>`
+  * `Accept: application/json`
 
-Response Body (200 OK) :
-
+* **Response Body (200 OK)** :
 ```json
 {
   "message": "New access token",
@@ -184,8 +225,14 @@ Response Body (200 OK) :
 }
 ```
 
-Response Body (400 / 401) :
+* **Response Body (400 Bad Request - Cookie Tidak Dikirimkan)** :
+```json
+{
+  "errors": "Validation error: [ { \"message\": \"Refresh token is required\" } ]"
+}
+```
 
+* **Response Body (401 Unauthorized - Token Tidak Valid / Sudah Logout)** :
 ```json
 {
   "errors": "Unauthorized"
@@ -194,28 +241,28 @@ Response Body (400 / 401) :
 
 ---
 
-## Logout User
+## 6. Logout User
 
-Endpoint : `DELETE /api/users/current`
+Menghapus `refresh_token` dari database dan membersihkan HttpOnly Cookie pada browser.
 
-Request Cookies :
-- `Cookie: refresh_token=<jwt_refresh_token>`
+* **Endpoint** : `DELETE /api/users/current`
+* **Request Headers / Cookies** :
+  * `Cookie: refresh_token=<jwt_refresh_token>`
 
-Response Headers :
-- `Set-Cookie: refresh_token=; Max-Age=0; ...` *(clears cookie)*
+* **Response Headers** :
+  * `Set-Cookie: refresh_token=; Max-Age=0; Path=/; Expires=...; HttpOnly; SameSite=Lax`
 
-Response Body (200 OK) :
-
+* **Response Body (200 OK)** :
 ```json
 {
   "message": "OK"
 }
 ```
 
-Response Body (400 / 401) :
-
+* **Response Body (401 Unauthorized - Sudah Pernah Logout / Token Tidak Ada)** :
 ```json
 {
   "errors": "User not found for already logged out"
 }
 ```
+
