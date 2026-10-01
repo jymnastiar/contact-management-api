@@ -1,0 +1,56 @@
+services:
+  backend:
+    build: .
+    container_name: backend-contact-management
+    command: ["bun", "--watch", "src/index.ts"]
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    environment:
+      PORT: ${PORT:-3000}
+      DATABASE_URL: ${DATABASE_URL}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      ACCESS_EXPIRES_IN: "15m"
+      REFRESH_EXPIRES_IN: "1d"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    container_name: database-contact-management
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-database}
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+    volumes:
+      - contact_data:/var/lib/postgres
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-database}",
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  pgadmin:
+    container_name: "db-panel-contact-management"
+    image: dpage/pgadmin4
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db
+
+volumes:
+  contact_data:

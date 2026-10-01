@@ -50,3 +50,14 @@ model Address {
 
   @@map("addresses")
 }
+
+model Category{
+  id String @id @db.VarChar(100)
+  name String @db.VarChar(255)
+  parent_id String? @db.VarChar(100)
+
+  parent Category? @relation("parent", fields: [parent_id], references: [id])
+  children Category[] @relation("parent")
+
+  @@map("categories")
+}
