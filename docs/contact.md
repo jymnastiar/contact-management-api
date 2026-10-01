@@ -12,9 +12,9 @@ Request Body :
 
 ```json
 {
-  "first_name": "Eko Kurniawan",
-  "last_name": "Khannedy",
-  "email": "eko@example.com",
+  "first_name": "Fadhli",
+  "last_name": "Gymnastiar",
+  "email": "jymnastiar@example.com",
   "phone": "089999999"
 }
 ```
@@ -26,9 +26,9 @@ Response Body (200 OK) :
 {
   "data": {
     "id": 1,
-    "first_name": "Eko Kurniawan",
-    "last_name": "Khannedy",
-    "email": "eko@example.com",
+    "first_name": "Fadhli",
+    "last_name": "Gymnastiar",
+    "email": "jymnastiar@example.com",
     "phone": "089999999"
   },
   "message": "Success to create new contact"
@@ -66,9 +66,9 @@ Response Body (200 OK) :
 {
   "data": {
     "id": 1,
-    "first_name": "Eko Kurniawan",
-    "last_name": "Khannedy",
-    "email": "eko@example.com",
+    "first_name": "Fadhli",
+    "last_name": "Gymnastiar",
+    "email": "jymnastiar@example.com",
     "phone": "089999999"
   },
   "message": "Successful get data"
@@ -105,9 +105,9 @@ Request Body :
 
 ```json
 {
-  "first_name": "Eko Kurniawan",
-  "last_name": "Khannedy",
-  "email": "eko@example.com",
+  "first_name": "Fadhli",
+  "last_name": "Gymnastiar",
+  "email": "jymnastiar@example.com",
   "phone": "089999999"
 }
 ```
@@ -119,9 +119,9 @@ Response Body (200 OK) :
 {
   "data": {
     "id": 1,
-    "first_name": "Eko Kurniawan",
-    "last_name": "Khannedy",
-    "email": "eko@example.com",
+    "first_name": "Fadhli",
+    "last_name": "Gymnastiar",
+    "email": "jymnastiar@example.com",
     "phone": "089999999"
   },
   "message": "Successful get contact"
@@ -209,9 +209,9 @@ Response Body (200 OK) :
   "data": [
     {
       "id": 1,
-      "first_name": "Eko Kurniawan",
-      "last_name": "Khannedy",
-      "email": "eko@example.com",
+      "first_name": "Fadhli",
+      "last_name": "Gymnastiar",
+      "email": "jymnastiar@example.com",
       "phone": "089999999"
     }
   ],

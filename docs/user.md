@@ -29,9 +29,9 @@ Mendaftarkan akun user baru ke dalam sistem.
 * **Request Body** :
 ```json
 {
-  "username": "eko_khannedy",
+  "username": "jymnastiar",
   "password": "secretpassword",
-  "name": "Eko Khannedy"
+  "name": "Fadhli Gymnastiar"
 }
 ```
 
@@ -48,8 +48,8 @@ Mendaftarkan akun user baru ke dalam sistem.
 {
   "message": " register new account",
   "data": {
-    "username": "eko_khannedy",
-    "name": "Eko Khannedy"
+    "username": "jymnastiar",
+    "name": "Fadhli Gymnastiar"
   },
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
@@ -83,7 +83,7 @@ Masuk ke akun yang sudah terdaftar untuk mendapatkan token akses dan cookie refr
 * **Request Body** :
 ```json
 {
-  "username": "eko_khannedy",
+  "username": "jymnastiar",
   "password": "secretpassword"
 }
 ```
@@ -96,8 +96,8 @@ Masuk ke akun yang sudah terdaftar untuk mendapatkan token akses dan cookie refr
 {
   "message": "Success login to account",
   "data": {
-    "username": "eko_khannedy",
-    "name": "Eko Khannedy"
+    "username": "jymnastiar",
+    "name": "Fadhli Gymnastiar"
   },
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
@@ -133,8 +133,8 @@ Mengambil informasi profil user yang sedang login saat ini.
 {
   "message": "Success get current user profile",
   "data": {
-    "username": "eko_khannedy",
-    "name": "Eko Khannedy"
+    "username": "jymnastiar",
+    "name": "Fadhli Gymnastiar"
   }
 }
 ```
@@ -175,7 +175,7 @@ Memperbarui data nama atau password user yang sedang login.
 * **Request Body** :
 ```json
 {
-  "name": "Eko Kurniawan Khannedy",
+  "name": "Fadhli Gymnastiar",
   "password": "newsecretpassword"
 }
 ```
@@ -186,8 +186,8 @@ Memperbarui data nama atau password user yang sedang login.
 {
   "message": "Successfully update user data",
   "data": {
-    "username": "eko_khannedy",
-    "name": "Eko Kurniawan Khannedy"
+    "username": "jymnastiar",
+    "name": "Fadhli Gymnastiar"
   }
 }
 ```
@@ -265,4 +265,3 @@ Menghapus `refresh_token` dari database dan membersihkan HttpOnly Cookie pada br
   "errors": "User not found for already logged out"
 }
 ```
-

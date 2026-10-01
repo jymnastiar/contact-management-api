@@ -1,0 +1,192 @@
+### Contact Management API - HTTP Test Requests
+### Compatible with REST Client (VS Code) & Thunder Client
+
+@baseUrl = http://localhost:3000
+@contactId = 1
+@addressId = 1
+
+### 👤 USER & AUTHENTICATION APIS (docs/user.md)
+
+### 1. Register User
+# @name register
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "jymnastiar",
+  "password": "secretpassword",
+  "name": "Fadhli Gymnastiar"
+}
+
+###
+
+### 2. Login User
+# @name login
+POST {{baseUrl}}/api/users/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "jymnastiar",
+  "password": "secretpassword"
+}
+
+### Simpan token dari response login secara otomatis (atau ganti jika manual)
+@accessToken = {{login.response.body.access_token}}
+
+###
+
+### 3. Get Current User Profile
+# @name getCurrentUser
+GET {{baseUrl}}/api/users/current
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### 4. Update Current User Profile
+# @name updateUser
+PATCH {{baseUrl}}/api/users/current
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Fadhli Gymnastiar",
+  "password": "newsecretpassword"
+}
+
+###
+
+### 5. Refresh Access Token (Requires Cookie)
+# @name refreshToken
+GET {{baseUrl}}/api/users/current/token
+Accept: application/json
+
+###
+
+### 6. Logout User (Clears Cookie and Revokes Token)
+# @name logoutUser
+DELETE {{baseUrl}}/api/users/current
+Accept: application/json
+
+
+### ==============================================================================
+### 📇 CONTACT APIS (docs/contact.md)
+### ==============================================================================
+
+### 1. Create Contact
+# @name createContact
+POST {{baseUrl}}/api/contacts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "first_name": "Fadhli",
+  "last_name": "Gymnastiar",
+  "email": "jymnastiar@example.com",
+  "phone": "089999999"
+}
+
+###
+
+### 2. Search / List Contacts (with pagination & filters)
+# @name searchContacts
+GET {{baseUrl}}/api/contacts?name=Fadhli&phone=089999999&page=1&size=10
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### 3. Get Contact by ID
+# @name getContact
+GET {{baseUrl}}/api/contacts/{{contactId}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### 4. Update Contact
+# @name updateContact
+PUT {{baseUrl}}/api/contacts/{{contactId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "first_name": "Fadhli",
+  "last_name": "Gymnastiar",
+  "email": "jymnastiar_updated@example.com",
+  "phone": "089999999"
+}
+
+###
+
+### 5. Remove Contact
+# @name removeContact
+DELETE {{baseUrl}}/api/contacts/{{contactId}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+
+### ==============================================================================
+### 🏠 ADDRESS APIS (docs/address.md)
+### ==============================================================================
+
+### 1. Create Address for Contact
+# @name createAddress
+POST {{baseUrl}}/api/contacts/{{contactId}}/addresses
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "street": "Jalan Mawar No. 12",
+  "city": "Bandung",
+  "province": "Jawa Barat",
+  "country": "Indonesia",
+  "postal_code": "40115"
+}
+
+###
+
+### 2. List Addresses for Contact
+# @name listAddresses
+GET {{baseUrl}}/api/contacts/{{contactId}}/addresses
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### 3. Get Address by ID
+# @name getAddress
+GET {{baseUrl}}/api/contacts/{{contactId}}/addresses/{{addressId}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+### 4. Update Address
+# @name updateAddress
+PUT {{baseUrl}}/api/contacts/{{contactId}}/addresses/{{addressId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "street": "Jalan Perubahan No. 99",
+  "city": "Surabaya",
+  "province": "Jawa Timur",
+  "country": "Indonesia",
+  "postal_code": "60111"
+}
+
+###
+
+### 5. Remove Address
+# @name removeAddress
+DELETE {{baseUrl}}/api/contacts/{{contactId}}/addresses/{{addressId}}
+Authorization: Bearer {{accessToken}}
+Accept: application/json

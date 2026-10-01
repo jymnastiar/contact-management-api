@@ -101,9 +101,9 @@ describe("Contact Controller", () => {
         .post("/api/contacts")
         .set("Authorization", `Bearer ${token}`)
         .send({
-          first_name: "Eko",
-          last_name: "Khannedy",
-          email: "eko@example.com",
+          first_name: "Fadhli",
+          last_name: "Gymnastiar",
+          email: "jymnastiar@example.com",
           phone: "0812345678",
         });
 
@@ -112,9 +112,9 @@ describe("Contact Controller", () => {
       expect(response.body.message).toBe("Success to create new contact");
       expect(response.body.data).toBeDefined();
       expect(response.body.data.id).toBeDefined();
-      expect(response.body.data.first_name).toBe("Eko");
-      expect(response.body.data.last_name).toBe("Khannedy");
-      expect(response.body.data.email).toBe("eko@example.com");
+      expect(response.body.data.first_name).toBe("Fadhli");
+      expect(response.body.data.last_name).toBe("Gymnastiar");
+      expect(response.body.data.email).toBe("jymnastiar@example.com");
       expect(response.body.data.phone).toBe("0812345678");
 
       // Verifikasi tersimpan di database
@@ -262,15 +262,15 @@ describe("Contact Controller", () => {
         .patch(`/api/contacts/${contact.id}`)
         .set("Authorization", `Bearer ${token}`)
         .send({
-          first_name: "Eko Updated",
-          email: "ekoupdated@example.com",
+          first_name: "Fadhli Updated",
+          email: "jymnastiarupdated@example.com",
         });
 
       logger.debug(response.body);
       expect(response.status).toBe(200);
       expect(response.body.data.id).toBe(contact.id);
-      expect(response.body.data.first_name).toBe("Eko Updated");
-      expect(response.body.data.email).toBe("ekoupdated@example.com");
+      expect(response.body.data.first_name).toBe("Fadhli Updated");
+      expect(response.body.data.email).toBe("jymnastiarupdated@example.com");
       expect(response.body.data.last_name).toBe(contact.last_name); // tidak berubah
       expect(response.body.data.phone).toBe(contact.phone); // tidak berubah
     });
@@ -321,9 +321,9 @@ describe("Contact Controller", () => {
       await prisma.contact.createMany({
         data: [
           {
-            first_name: "Eko",
-            last_name: "Khannedy",
-            email: "eko@example.com",
+            first_name: "Fadhli",
+            last_name: "Gymnastiar",
+            email: "jymnastiar@example.com",
             phone: "0811111111",
             username: "tester",
           },
@@ -336,7 +336,7 @@ describe("Contact Controller", () => {
           },
           {
             first_name: "Joko",
-            last_name: "Eko",
+            last_name: "Fadhli",
             email: "joko@example.com",
             phone: "0833333333",
             username: "tester",
@@ -368,7 +368,7 @@ describe("Contact Controller", () => {
 
     it("Should search contacts by name (matching first_name or last_name)", async () => {
       const response = await supertest(app)
-        .get("/api/contacts?name=Eko")
+        .get("/api/contacts?name=Fadhli")
         .set("Authorization", `Bearer ${token}`);
 
       logger.debug(response.body);
