@@ -2,9 +2,6 @@
 ### Compatible with REST Client (VS Code) & Thunder Client
 
 @baseUrl = http://localhost:3000
-@contactId = 1
-@addressId = 1
-
 ### 👤 USER & AUTHENTICATION APIS (docs/user.md)
 
 ### 1. Register User
@@ -32,15 +29,15 @@ Accept: application/json
   "password": "secretpassword"
 }
 
-### Simpan token dari response login secara otomatis (atau ganti jika manual)
-@accessToken = {{login.response.body.access_token}}
+### 
+@cookie = {{login.response.headers.Set-Cookie}}
 
 ###
 
 ### 3. Get Current User Profile
 # @name getCurrentUser
 GET {{baseUrl}}/api/users/current
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Accept: application/json
 
 ###
@@ -48,13 +45,13 @@ Accept: application/json
 ### 4. Update Current User Profile
 # @name updateUser
 PATCH {{baseUrl}}/api/users/current
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Content-Type: application/json
 Accept: application/json
 
 {
   "name": "Fadhli Gymnastiar",
-  "password": "newsecretpassword"
+  "password": "secretpassword"
 }
 
 ###
@@ -63,6 +60,7 @@ Accept: application/json
 # @name refreshToken
 GET {{baseUrl}}/api/users/current/token
 Accept: application/json
+Cookie: {{cookie}}
 
 ###
 
@@ -70,7 +68,7 @@ Accept: application/json
 # @name logoutUser
 DELETE {{baseUrl}}/api/users/current
 Accept: application/json
-
+Cookie: {{cookie}}
 
 ### ==============================================================================
 ### 📇 CONTACT APIS (docs/contact.md)
@@ -79,23 +77,26 @@ Accept: application/json
 ### 1. Create Contact
 # @name createContact
 POST {{baseUrl}}/api/contacts
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Content-Type: application/json
 Accept: application/json
 
 {
-  "first_name": "Fadhli",
+  "first_name": "Ambala",
   "last_name": "Gymnastiar",
   "email": "jymnastiar@example.com",
   "phone": "089999999"
 }
+###
+
+@contactId = {{createContact.response.body.data.id}}
 
 ###
 
 ### 2. Search / List Contacts (with pagination & filters)
 # @name searchContacts
-GET {{baseUrl}}/api/contacts?name=Fadhli&phone=089999999&page=1&size=10
-Authorization: Bearer {{accessToken}}
+GET {{baseUrl}}/api/contacts?name=Ambala&phone=089999999&page=1&size=10
+Authorization: Bearer {{login.response.body.access_token}}
 Accept: application/json
 
 ###
@@ -103,20 +104,20 @@ Accept: application/json
 ### 3. Get Contact by ID
 # @name getContact
 GET {{baseUrl}}/api/contacts/{{contactId}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Accept: application/json
 
 ###
 
 ### 4. Update Contact
 # @name updateContact
-PUT {{baseUrl}}/api/contacts/{{contactId}}
-Authorization: Bearer {{accessToken}}
+PATCH {{baseUrl}}/api/contacts/{{contactId}}
+Authorization: Bearer {{login.response.body.access_token}}
 Content-Type: application/json
 Accept: application/json
 
 {
-  "first_name": "Fadhli",
+  "first_name": "Ambala Sudah Mandi",
   "last_name": "Gymnastiar",
   "email": "jymnastiar_updated@example.com",
   "phone": "089999999"
@@ -127,7 +128,7 @@ Accept: application/json
 ### 5. Remove Contact
 # @name removeContact
 DELETE {{baseUrl}}/api/contacts/{{contactId}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Accept: application/json
 
 
@@ -138,7 +139,7 @@ Accept: application/json
 ### 1. Create Address for Contact
 # @name createAddress
 POST {{baseUrl}}/api/contacts/{{contactId}}/addresses
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -149,13 +150,16 @@ Accept: application/json
   "country": "Indonesia",
   "postal_code": "40115"
 }
+###
+
+@addressId = {{createAddress.response.body.data.id}}
 
 ###
 
 ### 2. List Addresses for Contact
 # @name listAddresses
 GET {{baseUrl}}/api/contacts/{{contactId}}/addresses
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Accept: application/json
 
 ###
@@ -163,7 +167,7 @@ Accept: application/json
 ### 3. Get Address by ID
 # @name getAddress
 GET {{baseUrl}}/api/contacts/{{contactId}}/addresses/{{addressId}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Accept: application/json
 
 ###
@@ -171,7 +175,7 @@ Accept: application/json
 ### 4. Update Address
 # @name updateAddress
 PUT {{baseUrl}}/api/contacts/{{contactId}}/addresses/{{addressId}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -188,5 +192,5 @@ Accept: application/json
 ### 5. Remove Address
 # @name removeAddress
 DELETE {{baseUrl}}/api/contacts/{{contactId}}/addresses/{{addressId}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{login.response.body.access_token}}
 Accept: application/json

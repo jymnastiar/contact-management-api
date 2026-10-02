@@ -11,4 +11,5 @@
 export type * from './models/User.ts'
 export type * from './models/Contact.ts'
 export type * from './models/Address.ts'
+export type * from './models/Category.ts'
 export type * from './commonInputTypes.ts'

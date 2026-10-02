@@ -8,11 +8,11 @@ import {
   it,
 } from "bun:test";
 import supertest from "supertest";
-import { app } from "../src/app";
-import { logger } from "../src/config/logger";
+import { app } from "../../src/app";
+import { logger } from "../../src/config/logger";
 import { ContactTest, UserTest } from "./test.util";
-import { GenerateToken } from "../src/lib/generateToken";
-import { prisma } from "../src/lib/prisma";
+import { GenerateToken } from "../../src/lib/generateToken";
+import { prisma } from "../../src/lib/prisma";
 
 describe("Contact Controller", () => {
   let token: string;

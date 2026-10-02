@@ -1,4 +1,4 @@
-import { prisma } from "../src/lib/prisma";
+import { prisma } from "../../src/lib/prisma";
 import bcrypt from "bcrypt";
 
 export class UserTest {
@@ -94,3 +94,34 @@ export class AddressTest {
     });
   }
 }
+
+export class CategoryTest {
+  static async deleteAll() {
+    await prisma.category.deleteMany();
+  }
+
+  static async createParentsAndChildren() {
+    await prisma.category.createMany({
+      data: [
+        { id: "test-elektronik", name: "Elektronik & Gadget", parent_id: null },
+        { id: "test-makanan", name: "Makanan & Camilan", parent_id: null },
+        {
+          id: "test-smartphone",
+          name: "Smartphone & HP",
+          parent_id: "test-elektronik",
+        },
+        {
+          id: "test-laptop",
+          name: "Laptop & Ultrabook",
+          parent_id: "test-elektronik",
+        },
+        {
+          id: "test-snack",
+          name: "Makanan Ringan & Snack Keripik",
+          parent_id: "test-makanan",
+        },
+      ],
+    });
+  }
+}
+

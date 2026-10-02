@@ -1,12 +1,12 @@
 import { describe, expect, it, mock } from "bun:test";
-import { authMiddleware } from "../src/middleware/auth.middleware";
-import { errorMiddleware } from "../src/middleware/error.middleware";
-import { ResponseError } from "../src/error/response.error";
-import { GenerateToken } from "../src/lib/generateToken";
+import { authMiddleware } from "../../src/middleware/auth.middleware";
+import { errorMiddleware } from "../../src/middleware/error.middleware";
+import { ResponseError } from "../../src/error/response.error";
+import { GenerateToken } from "../../src/lib/generateToken";
 import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { z } from "zod";
 import type { Response, NextFunction } from "express";
-import type { UserRequest } from "../src/types/users.type";
+import type { UserRequest } from "../../src/types/users.type";
 
 describe("authMiddleware", () => {
   it("Should call next with Error when Authorization header is missing", async () => {

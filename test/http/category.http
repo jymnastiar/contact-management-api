@@ -1,0 +1,7 @@
+
+@baseUrl = http://localhost:3000
+
+### Category APIS
+# @name list
+GET {{baseUrl}}/api/categories/
+Accept: application/json

@@ -124,4 +124,6 @@ Endpoint specifications and request/response contracts are documented in the `do
 - [User & Auth API](docs/user.md)
 - [Contact API](docs/contact.md)
 - [Address API](docs/address.md)
+- [Category API](docs/category.md)
+
 

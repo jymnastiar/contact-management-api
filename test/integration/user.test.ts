@@ -8,11 +8,14 @@ import {
   it,
 } from "bun:test";
 import supertest from "supertest";
-import { app } from "../src/app";
-import { logger } from "../src/config/logger";
+import { app } from "../../src/app";
+import { logger } from "../../src/config/logger";
 import { UserTest } from "./test.util";
-import type { UserResponse, UsersApiResponse } from "../src/types/users.type";
-import { GenerateToken } from "../src/lib/generateToken";
+import type {
+  UserResponse,
+  UsersApiResponse,
+} from "../../src/types/users.type";
+import { GenerateToken } from "../../src/lib/generateToken";
 import jwt from "jsonwebtoken";
 
 describe("POST /api/users/", () => {
@@ -50,7 +53,8 @@ describe("POST /api/users/", () => {
 
     //? Verifikasi refresh_token pada cookie
     const cookies = response.headers["set-cookie"] as unknown as
-      string[] | undefined;
+      | string[]
+      | undefined;
     expect(cookies).toBeDefined();
     expect(
       cookies?.some((cookie: string) => cookie.includes("refresh_token=")),
@@ -179,7 +183,8 @@ describe("DELETE /api/users/current", () => {
 
     //? Verifikasi cookie refresh_token dihapus / dibersihkan
     const responseCookies = response.headers["set-cookie"] as
-      string[] | undefined;
+      | string[]
+      | undefined;
     expect(responseCookies).toBeDefined();
     expect(
       responseCookies?.some((cookie: string) =>

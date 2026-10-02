@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import contactRouter from "./routes/contact.router";
 import addressRouter from "./routes/address.router";
+import CategoryRouter from "./routes/category.router";
 
 export const app: Application = express();
 
@@ -36,6 +37,7 @@ app.use(
 app.use("/api/users", userRouter);
 app.use("/api/contacts", contactRouter);
 app.use("/api/contacts/:contactId/addresses", addressRouter);
+app.use("/api/categories", CategoryRouter);
 app.use(errorMiddleware);
 
 app.get("/", (req, res) => {

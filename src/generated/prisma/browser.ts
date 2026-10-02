@@ -32,3 +32,8 @@ export type Contact = Prisma.ContactModel
  * 
  */
 export type Address = Prisma.AddressModel
+/**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
