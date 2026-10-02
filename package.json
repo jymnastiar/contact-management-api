@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
-    "test": "bun test/integration",
+    "test": "DATABASE_URL=\"postgresql://admin:admin@localhost:5433/categories\" bun test test/integration",
     "test:performance": "bun test/performance",
     "build": "bun build ./src/index.ts --outdir ./dist --target bun --minify"
   },
