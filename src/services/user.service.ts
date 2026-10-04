@@ -11,7 +11,6 @@ import {
 import { UserValidation } from "../validations/user.validation";
 import { Validation } from "../validations/validation";
 import { ResponseError } from "../error/response.error";
-import bcrypt from "bcrypt";
 import { GenerateToken } from "../lib/generateToken";
 import { verify, type JwtPayload } from "jsonwebtoken";
 
@@ -37,8 +36,14 @@ export class UserService {
     );
 
     //? hashed data
-    const hashedRefreshToken = await bcrypt.hash(rawRefreshToken, 10);
-    const hashedPassword = await bcrypt.hash(registerRequest.password, 10);
+    const hashedRefreshToken = await Bun.password.hash(rawRefreshToken, {
+      algorithm: "bcrypt",
+      cost: 10,
+    });
+    const hashedPassword = await Bun.password.hash(registerRequest.password, {
+      algorithm: "bcrypt",
+      cost: 10,
+    });
 
     const user = await prisma.user.create({
       data: {
@@ -68,7 +73,7 @@ export class UserService {
       throw new ResponseError(400, "Username not register yet");
     }
 
-    const isPasswordValid = await bcrypt.compare(
+    const isPasswordValid = await Bun.password.verify(
       loginRequest.password,
       user.password,
     );
@@ -79,7 +84,10 @@ export class UserService {
 
     //? generate refresh_token
     const rawRefreshToken = GenerateToken.generateRefreshToken(user.username);
-    const hashedRefreshToken = await bcrypt.hash(rawRefreshToken, 10);
+    const hashedRefreshToken = await Bun.password.hash(rawRefreshToken, {
+      algorithm: "bcrypt",
+      cost: 10,
+    });
 
     const updatedUser = await prisma.user.update({
       where: {
@@ -150,7 +158,10 @@ export class UserService {
         data: {
           ...(updateRequest.name && { name: updateRequest.name }),
           ...(updateRequest.password && {
-            password: await bcrypt.hash(updateRequest.password, 10),
+            password: await Bun.password.hash(updateRequest.password, {
+              algorithm: "bcrypt",
+              cost: 10,
+            }),
           }),
         },
       });
@@ -195,7 +206,10 @@ export class UserService {
     }
 
     //? Cocokkan refresh token yang dikirim dengan hash token yang tersimpan di DB
-    const validUser = await bcrypt.compare(refreshToken, user.refresh_token!);
+    const validUser = await Bun.password.verify(
+      refreshToken,
+      user.refresh_token!,
+    );
 
     //? Jika token tidak cocok (misal sudah diganti karena login ulang di tempat lain)
     if (!validUser) {

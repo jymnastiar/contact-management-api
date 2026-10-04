@@ -1,5 +1,4 @@
 import { prisma } from "../../src/lib/prisma";
-import bcrypt from "bcrypt";
 
 export class UserTest {
   static async delete() {
@@ -16,7 +15,10 @@ export class UserTest {
       data: {
         name: "tester",
         username: "tester",
-        password: await bcrypt.hash("tester", 10),
+        password: await Bun.password.hash("tester", {
+          algorithm: "bcrypt",
+          cost: 10,
+        }),
       },
     });
   }
@@ -124,4 +126,3 @@ export class CategoryTest {
     });
   }
 }
-

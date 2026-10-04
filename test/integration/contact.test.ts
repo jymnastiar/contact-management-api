@@ -9,7 +9,7 @@ import {
 } from "bun:test";
 import supertest from "supertest";
 import { app } from "../../src/app";
-import { logger } from "../../src/config/logger";
+import { logger } from "../../src/lib/logger";
 import { ContactTest, UserTest } from "./test.util";
 import { GenerateToken } from "../../src/lib/generateToken";
 import { prisma } from "../../src/lib/prisma";

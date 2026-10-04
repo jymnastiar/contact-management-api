@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { ResponseError } from "../error/response.error";
 import { ZodError } from "zod";
-import { logger } from "../config/logger";
+import { logger } from "../lib/logger";
 
 export async function errorMiddleware(
   error: Error,

@@ -1,6 +1,8 @@
 services:
   backend:
-    build: .
+    build:
+      context: .
+      target: runner
     container_name: backend-contact-management
     ports:
       - 3000:3000
@@ -11,21 +13,26 @@ services:
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
       ACCESS_EXPIRES_IN: "15m"
       REFRESH_EXPIRES_IN: "1d"
+      REDIS_DATABASE_URL: ${REDIS_DATABASE_URL:-redis://admin:admin123@redis:6379}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_USERNAME: ${REDIS_USERNAME:-admin}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-admin123}
     depends_on:
+      redis:
+        condition: service_started
       db:
         condition: service_healthy
 
   db:
     image: postgres:16-alpine
     container_name: database-contact-management
-    ports:
-      - 5433:5432
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-database}
       POSTGRES_USER: ${POSTGRES_USER:-admin}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
     volumes:
-      - contact_data:/var/lib/postgres/data
+      - contact_management_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
       test:
@@ -37,16 +44,15 @@ services:
       timeout: 3s
       retries: 5
 
-  pgadmin:
-    container_name: "db-panel-contact-management"
-    image: dpage/pgadmin4
-    ports:
-      - "8080:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    depends_on:
-      - db
+  redis:
+    image: redis:alpine
+    container_name: redis-server-contact-management
+    restart: always
+    volumes:
+      - ./src/config/redis.conf:/usr/local/etc/redis/redis.conf
+      - redis-contact-management:/data
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
 
 volumes:
-  contact_data:
+  contact_management_data:
+  redis-contact-management:

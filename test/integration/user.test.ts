@@ -9,7 +9,7 @@ import {
 } from "bun:test";
 import supertest from "supertest";
 import { app } from "../../src/app";
-import { logger } from "../../src/config/logger";
+import { logger } from "../../src/lib/logger";
 import { UserTest } from "./test.util";
 import type {
   UserResponse,

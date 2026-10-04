@@ -9,7 +9,7 @@ import {
 } from "bun:test";
 import supertest from "supertest";
 import { app } from "../../src/app";
-import { logger } from "../../src/config/logger";
+import { logger } from "../../src/lib/logger";
 import { AddressTest, ContactTest, UserTest } from "./test.util";
 import { GenerateToken } from "../../src/lib/generateToken";
 import type { Contact } from "../../src/generated/prisma/client";

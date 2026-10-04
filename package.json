@@ -6,14 +6,14 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
-    "test": "DATABASE_URL=\"postgresql://admin:admin@localhost:5433/categories\" bun test test/integration",
+    "test": "bun test test/integration",
     "test:performance": "bun test/performance",
+    "seed": "bun --env-file=.env.test.local prisma/seed.ts",
     "build": "bun build ./src/index.ts --outdir ./dist --target bun --minify"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
-    "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "express": "^5.2.1",
@@ -26,12 +26,12 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
     "@types/bun": "latest",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/k6": "^2.3.0",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.2.1",
     "knip": "^6.36.0",

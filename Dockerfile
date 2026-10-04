@@ -1,17 +1,28 @@
-FROM oven/bun:latest AS builder
+# Base Stage
+FROM oven/bun:1 AS base
 WORKDIR /app
-
 COPY package.json bun.lock tsconfig.json ./
 COPY prisma ./prisma/
 COPY prisma*.config.ts ./
 
+# Development stage
+FROM base AS development
+ENV NODE_ENV=development
+RUN bun install
+RUN bunx prisma generate
+EXPOSE 3000
+CMD ["bun", "--watch", "src/index.ts"]
+
+# Builder Stage
+FROM base AS builder
 RUN bun install --frozen-lockfile
 RUN bunx prisma generate
-
 COPY src ./src
 RUN bun run build
+RUN rm -rf node_modules && bun install --production --frozen-lockfile
 
-FROM oven/bun:latest AS runner
+# Runner Stage
+FROM oven/bun:1-slim AS runner
 WORKDIR /app
 
 LABEL maintainer="Jymnastiar"
@@ -22,15 +33,12 @@ ENV PORT=3000
 
 COPY --chown=bun:bun package.json bun.lock ./
 COPY --chown=bun:bun prisma ./prisma/
-COPY --chown=bun:bun prisma*.config.ts ./
-RUN bun install --production --frozen-lockfile && bunx prisma generate
-
+COPY --chown=bun:bun --from=builder /app/node_modules ./node_modules
 COPY --chown=bun:bun --from=builder /app/dist ./dist
 
-RUN mkdir -p /app/logs && chown -R bun:bun /app && chmod -R 777 /app
+RUN mkdir -p /app/logs && chown -R bun:bun /app
 
 USER bun
-
 EXPOSE 3000
 
 HEALTHCHECK --interval=15s --timeout=3s --retries=3 \

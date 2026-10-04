@@ -1,6 +1,6 @@
 import express, { type Application } from "express";
 import pinoHttp from "pino-http";
-import { logger } from "./config/logger";
+import { logger } from "./lib/logger";
 import userRouter from "./routes/user.router";
 import { errorMiddleware } from "./middleware/error.middleware";
 import cookieParser from "cookie-parser";
