@@ -43,11 +43,11 @@ export class AuthHelper {
     );
 
     const checkCurrentResponse = check(currentResponse, {
-      "Current response must be 200": (res) => res.status === 200,
+      "Status is 200 or 429": (res) => res.status === 200 || res.status === 429,
     });
 
     if (!checkCurrentResponse) {
-      fail("Failed to get current account");
+      fail("Failed: status was " + currentResponse.status);
     }
 
     return currentResponse;

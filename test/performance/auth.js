@@ -7,14 +7,21 @@ export const options = {
   duration: "10s",
 };
 
-export default function () {
+export function setup() {
   const body = {
-    username: `user_${exec.scenario.iterationInTest}_${Date.now()}`,
+    username: `user_${Date.now()}`,
     password: "password",
-    name: `Virtual User`,
+    name: "Rate Limit Tester",
   };
+  const registerRes = AuthHelper.register(body);
+  return {
+    token: registerRes.json("access_token"),
+    refresh_token: registerRes.cookies["refresh_token"][0].value,
+  };
+}
 
-  const registerResponse = AuthHelper.register(body);
+export default function (data) {
+  AuthHelper.current(data.token);
 
-  AuthHelper.refreshToken(registerResponse.cookies["refresh_token"][0].value);
+  // AuthHelper.refreshToken(data.refresh_token);
 }

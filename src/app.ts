@@ -8,6 +8,7 @@ import cors from "cors";
 import contactRouter from "./routes/contact.router";
 import addressRouter from "./routes/address.router";
 import CategoryRouter from "./routes/category.router";
+import { rateLimiter } from "./middleware/rateLimit.middleware";
 
 export const app: Application = express();
 
@@ -34,6 +35,7 @@ app.use(
 );
 
 //? Route
+app.use(rateLimiter());
 app.use("/api/users", userRouter);
 app.use("/api/contacts", contactRouter);
 app.use("/api/contacts/:contactId/addresses", addressRouter);
