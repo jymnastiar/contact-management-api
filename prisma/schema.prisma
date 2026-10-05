@@ -16,7 +16,6 @@ model User {
   username      String  @id @db.VarChar(100)
   password      String  @db.VarChar(100)
   name          String  @db.VarChar(100)
-  refresh_token String? @db.Text
 
   contacts Contact[]
 

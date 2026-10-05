@@ -13,6 +13,7 @@ import { Validation } from "../validations/validation";
 import { ResponseError } from "../error/response.error";
 import { GenerateToken } from "../lib/generateToken";
 import { verify, type JwtPayload } from "jsonwebtoken";
+import { redisClient } from "../lib/redis";
 
 export class UserService {
   static async register(request: RegisterUserRequest): Promise<AuthResponse> {
@@ -31,15 +32,11 @@ export class UserService {
       throw new ResponseError(400, "Username already exists");
     }
 
-    const rawRefreshToken = GenerateToken.generateRefreshToken(
+    const refreshTokenPayload = GenerateToken.generateRefreshToken(
       registerRequest.username,
     );
 
     //? hashed data
-    const hashedRefreshToken = await Bun.password.hash(rawRefreshToken, {
-      algorithm: "bcrypt",
-      cost: 10,
-    });
     const hashedPassword = await Bun.password.hash(registerRequest.password, {
       algorithm: "bcrypt",
       cost: 10,
@@ -50,13 +47,19 @@ export class UserService {
         username: registerRequest.username,
         name: registerRequest.name,
         password: hashedPassword,
-        refresh_token: hashedRefreshToken,
       },
     });
 
+    //? token store on redis
+    await redisClient.setex(
+      `refresh_token:${refreshTokenPayload.tokenId}`,
+      60 * 60 * 24, //same as refresh_token_exp
+      refreshTokenPayload.refreshToken,
+    );
+
     return {
       data: toUserResponse(user),
-      refresh_token: rawRefreshToken,
+      refresh_token: refreshTokenPayload.refreshToken,
     };
   }
 
@@ -83,24 +86,19 @@ export class UserService {
     }
 
     //? generate refresh_token
-    const rawRefreshToken = GenerateToken.generateRefreshToken(user.username);
-    const hashedRefreshToken = await Bun.password.hash(rawRefreshToken, {
-      algorithm: "bcrypt",
-      cost: 10,
-    });
+    const refreshTokenPayload = GenerateToken.generateRefreshToken(
+      user.username,
+    );
 
-    const updatedUser = await prisma.user.update({
-      where: {
-        username: user.username,
-      },
-      data: {
-        refresh_token: hashedRefreshToken,
-      },
-    });
+    await redisClient.setex(
+      `refresh_token:${refreshTokenPayload.tokenId}`,
+      60 * 60 * 24,
+      refreshTokenPayload.refreshToken,
+    );
 
     return {
-      data: toUserResponse(updatedUser),
-      refresh_token: rawRefreshToken!,
+      data: toUserResponse(user),
+      refresh_token: refreshTokenPayload.refreshToken!,
     };
   }
 
@@ -118,18 +116,12 @@ export class UserService {
 
     const payload = verify(refresh_token, secretKey) as JwtPayload & {
       username: string;
+      tokenId: string;
     };
 
-    const result = await prisma.user.updateMany({
-      where: {
-        username: payload.username,
-      },
-      data: {
-        refresh_token: null,
-      },
-    });
+    const result = await redisClient.del(`refresh_token:${payload.tokenId}`);
 
-    if (result.count === 0) {
+    if (result === 0) {
       throw new ResponseError(401, "User not found for already logged out");
     }
   }
@@ -193,29 +185,23 @@ export class UserService {
     }
     const payload = verify(refreshToken, secretKey) as JwtPayload & {
       username: string;
+      tokenId: string;
     };
 
-    //? Cari user di database berdasarkan payload username dari token
-    const user = await prisma.user.findUnique({
-      where: { username: payload.username },
-    });
-
-    //? Pastikan user masih ada di DB dan belum pernah logout (refresh_token tidak null)
-    if (!user || !user.refresh_token) {
-      throw new ResponseError(401, "Unauthorized");
-    }
-
-    //? Cocokkan refresh token yang dikirim dengan hash token yang tersimpan di DB
-    const validUser = await Bun.password.verify(
-      refreshToken,
-      user.refresh_token!,
+    const storedToken = await redisClient.get(
+      `refresh_token:${payload.tokenId}`,
     );
 
-    //? Jika token tidak cocok (misal sudah diganti karena login ulang di tempat lain)
-    if (!validUser) {
-      throw new ResponseError(401, "Unauthorized");
+    if (!storedToken) {
+      throw new ResponseError(
+        401,
+        "Unauthorized: Session expired or logged out",
+      );
     }
 
+    if (storedToken !== refreshToken) {
+      throw new ResponseError(401, "Unauthorized: Token mismatch");
+    }
     const accessToken = GenerateToken.generateAccessToken(payload.username);
 
     return accessToken;

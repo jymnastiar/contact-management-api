@@ -52,4 +52,29 @@ export class AuthHelper {
 
     return currentResponse;
   }
+
+  static refreshToken(refreshToken) {
+    const refreshTokenResponse = http.get(
+      "http://localhost:3000/api/users/current/token",
+      {
+        headers: {
+          Accept: "application/json",
+        },
+        cookies: {
+          refresh_token: refreshToken,
+        },
+      },
+    );
+
+    const checkRefreshTokenResponse = check(refreshTokenResponse, {
+      "Refresh token response must be 200": (res) => res.status === 200,
+      "has access token": (r) => r.json("access_token") !== undefined,
+    });
+
+    if (!checkRefreshTokenResponse) {
+      fail("Failed to get current account");
+    }
+
+    return refreshTokenResponse;
+  }
 }

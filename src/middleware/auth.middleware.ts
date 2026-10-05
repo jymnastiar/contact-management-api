@@ -25,6 +25,7 @@ export async function authMiddleware(
 
     const payload = verify(accessToken, secretKey) as JwtPayload & {
       username: string;
+      tokenId: string;
     };
     if (!payload.username || typeof payload.username !== "string") {
       throw new ResponseError(401, "Invalid token payload");
@@ -32,6 +33,7 @@ export async function authMiddleware(
 
     (req as UserRequest).user = {
       username: payload.username,
+      tokenId: payload.tokenId,
     };
     next();
   } catch (error) {

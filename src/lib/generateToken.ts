@@ -14,8 +14,12 @@ export class GenerateToken {
     return sign(payload, secretKey, options);
   }
 
-  static generateRefreshToken(username: string): string {
-    const payload = { username };
+  static generateRefreshToken(username: string): {
+    refreshToken: string;
+    tokenId: string;
+  } {
+    const tokenId = crypto.randomUUID();
+    const payload = { username, tokenId };
     const secretKey = process.env.REFRESH_TOKEN_SECRET;
     if (!secretKey) {
       throw new Error("REFRESH_TOKEN_SECRET is not configured in .env");
@@ -24,6 +28,11 @@ export class GenerateToken {
       expiresIn: (process.env.REFRESH_EXPIRES_IN ||
         "1d") as SignOptions["expiresIn"],
     };
-    return sign(payload, secretKey, options);
+    const refreshToken = sign(payload, secretKey, options);
+
+    return {
+      refreshToken,
+      tokenId,
+    };
   }
 }

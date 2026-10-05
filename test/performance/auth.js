@@ -16,7 +16,5 @@ export default function () {
 
   const registerResponse = AuthHelper.register(body);
 
-  const responseBody = registerResponse.json();
-
-  AuthHelper.current(responseBody.access_token);
+  AuthHelper.refreshToken(registerResponse.cookies["refresh_token"][0].value);
 }

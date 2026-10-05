@@ -25,6 +25,7 @@ export type UpdateUserRequest = z.infer<typeof UserValidation.UPDATE>;
 export interface UserRequest extends Request {
   user?: {
     username: string;
+    tokenId: string;
   };
 }
 
